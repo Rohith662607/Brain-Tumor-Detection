@@ -10,7 +10,7 @@ existing `detections_json` column. Nullable/defaulted, so this is additive.
 import json
 from datetime import datetime
 from typing import Optional
-
+from pathlib import Path
 from sqlmodel import Field, SQLModel, Session, create_engine, select
 
 from .config import settings
@@ -54,10 +54,23 @@ class Detection(SQLModel, table=True):
         return json.loads(self.chat_history_json or "[]")
 
 
-engine = create_engine(settings.database_url, connect_args={"check_same_thread": False})
+# Make sure the SQLite database directory exists before SQLAlchemy connects.
+if settings.database_url.startswith("sqlite:///"):
+    db_path = settings.database_url.replace("sqlite:///", "", 1)
+    Path(db_path).parent.mkdir(parents=True, exist_ok=True)
+
+engine = create_engine(
+    settings.database_url,
+    connect_args={"check_same_thread": False},
+)
 
 
 def init_db():
+    # Ensure storage/database directory exists before creating tables.
+    if settings.database_url.startswith("sqlite:///"):
+        db_path = settings.database_url.replace("sqlite:///", "", 1)
+        Path(db_path).parent.mkdir(parents=True, exist_ok=True)
+
     SQLModel.metadata.create_all(engine)
     # NOTE: create_all() only creates NEW tables, it does not alter existing
     # ones. If you already have an existing storage/app.db from before this

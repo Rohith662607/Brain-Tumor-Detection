@@ -19,6 +19,9 @@ COPY ml/ ./ml/
 COPY backend/ ./backend/
 
 WORKDIR /app/backend
+RUN mkdir -p /app/backend/storage/uploads \
+    /app/backend/storage/annotated \
+    /app/backend/storage/reports
 RUN pip install --no-cache-dir -r requirements.txt
 
 ENV APP_ML_DIR=/app/ml
