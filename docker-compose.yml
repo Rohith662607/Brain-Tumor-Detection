@@ -1,0 +1,52 @@
+# Brings up the backend API + frontend together.
+#
+#   docker compose up --build
+#
+# Prerequisites:
+#   - You've trained a model (see ml/README.md) OR you're fine running with
+#     the stock (non-tumor-tuned) yolo11n.pt fallback to explore the API/UI.
+#   - Set MODEL_WEIGHTS_PATH below to your trained checkpoint if you have one.
+#
+# This does NOT include a training service — training needs a GPU and
+# interactive iteration (see ml/README.md and docs/TRAINING_GUIDE.md); it's
+# meant to be run directly on your machine or a Colab/Kaggle GPU, not as a
+# long-running container. Run it, get best.pt, then bring this stack up.
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      APP_MODEL_WEIGHTS: ${MODEL_WEIGHTS_PATH:-/app/ml/yolo11n.pt}
+      APP_CORS_ORIGINS: '["http://localhost:3000"]'
+      APP_DATABASE_URL: sqlite:////app/backend/storage/app.db
+    volumes:
+      # persists uploads/reports/the SQLite db across restarts
+      - backend-storage:/app/backend/storage
+      # mount your trained weights + config in without rebuilding the image
+      - ./ml/runs:/app/ml/runs:ro
+      - ./ml/configs:/app/ml/configs:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  backend-storage:

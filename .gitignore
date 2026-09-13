@@ -1,0 +1,12 @@
+**/.venv/
+**/node_modules/
+**/.next/
+backend/storage/
+ml/runs/
+ml/mlruns/
+ml/data/processed/
+ml/data/raw/
+*.pyc
+__pycache__/
+.env
+.env.local

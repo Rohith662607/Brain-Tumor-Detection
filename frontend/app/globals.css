@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Light theme (default) — clean clinical: crisp white, soft blue */
+  :root {
+    --color-void: 245 248 252;
+    --color-surface: 255 255 255;
+    --color-raised: 238 243 250;
+    --color-line: 220 230 242;
+    --color-ink-primary: 27 42 58;
+    --color-ink-muted: 91 112 134;
+    --color-ink-faint: 147 166 184;
+    --color-cyan: 46 123 198;
+    --color-cyan-dim: 220 235 250;
+    --color-signal-positive: 209 67 67;
+    --color-signal-positive-dim: 252 235 235;
+    --color-signal-clear: 30 158 107;
+    --color-signal-clear-dim: 231 248 240;
+    --color-accent-ink: 255 255 255;
+  }
+
+  /* Dark theme — reading-room dark, teal accent */
+  html.dark {
+    --color-void: 11 15 20;
+    --color-surface: 19 26 34;
+    --color-raised: 27 36 46;
+    --color-line: 38 50 61;
+    --color-ink-primary: 232 237 242;
+    --color-ink-muted: 132 150 166;
+    --color-ink-faint: 84 98 111;
+    --color-cyan: 79 209 197;
+    --color-cyan-dim: 46 125 116;
+    --color-signal-positive: 255 107 91;
+    --color-signal-positive-dim: 58 31 28;
+    --color-signal-clear: 95 191 119;
+    --color-signal-clear-dim: 27 46 32;
+    --color-accent-ink: 11 15 20;
+  }
+
+  body {
+    @apply bg-void text-ink-primary font-body antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.cyan.DEFAULT");
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: theme("colors.cyan.dim");
+    color: theme("colors.ink.primary");
+  }
+
+  .reticle-corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-color: theme("colors.cyan.DEFAULT");
+    opacity: 0.55;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: theme("colors.line");
+    border-radius: 999px;
+    border: 2px solid theme("colors.void");
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme("colors.ink.faint");
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

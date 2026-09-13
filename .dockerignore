@@ -1,0 +1,19 @@
+# Applies to any `docker build` run from the project root.
+# Datasets and training runs are mounted as volumes (see docker-compose.yml),
+# not baked into images — they're large and change independently of the code.
+ml/data/raw/
+ml/data/processed/
+ml/runs/
+ml/mlruns/
+ml/__pycache__/
+ml/**/__pycache__/
+
+backend/storage/
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+
+frontend/node_modules/
+frontend/.next/
+
+.git/

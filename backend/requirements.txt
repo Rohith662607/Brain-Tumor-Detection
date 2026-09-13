@@ -1,0 +1,20 @@
+# Web framework
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9        # required for UploadFile
+
+# Config + DB
+pydantic-settings>=2.2
+sqlmodel>=0.0.16                # SQLite by default; swap database_url for Postgres if needed
+
+# ML (must match ml/requirements.txt — inference_service.py imports ml/predict.py)
+ultralytics>=8.3
+torch>=2.2
+torchvision>=0.17
+Pillow>=10.2
+PyYAML>=6.0
+reportlab>=4.1
+fpdf2>=2.7
+
+
+openai>=1.30

@@ -1,0 +1,24 @@
+# Core ML stack — all free/open-source, installable via `pip install -r requirements.txt`
+torch>=2.2
+torchvision>=0.17
+ultralytics>=8.3          # YOLOv11 ships inside the ultralytics package
+opencv-python-headless>=4.9
+numpy>=1.26
+pandas>=2.2
+matplotlib>=3.8
+scikit-learn>=1.4
+Pillow>=10.2
+PyYAML>=6.0
+
+# Experiment tracking (local/free — no account or API key required)
+mlflow>=2.12
+tensorboard>=2.16
+
+# Report generation (predict.py)
+reportlab>=4.1             # PDF detection reports
+fpdf2>=2.7                 # fallback lightweight PDF writer
+
+# API (used by the backend, listed here too so `ml/` is independently installable)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9

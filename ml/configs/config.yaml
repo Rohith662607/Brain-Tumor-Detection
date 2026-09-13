@@ -1,0 +1,102 @@
+# =============================================================================
+# Brain Tumor Detection — central configuration
+# Every script (prepare_dataset.py, train.py, evaluate.py, predict.py, export.py)
+# reads its defaults from here. Override any value with a CLI flag; nothing in
+# the code is hardcoded.
+# =============================================================================
+
+project:
+  name: brain-tumor-detection
+  seed: 42
+
+# ---------------------------------------------------------------------------
+# Dataset
+# ---------------------------------------------------------------------------
+data:
+  # Root of the RAW dataset exactly as it ships from Kaggle / your archive:
+  #   raw_root/axial_t1wce_2_class/{images,labels}/{train,test}
+  #   raw_root/coronal_t1wce_2_class/{images,labels}/{train,test}
+  #   raw_root/sagittal_t1wce_2_class/{images,labels}/{train,test}
+  raw_root: "./data/raw/archive"
+
+  # Where prepare_dataset.py writes the merged, validated, YOLO-ready dataset
+  processed_root: "./data/processed"
+
+  # Fraction of the merged "train" split carved out as a validation set
+  # (the original archive only ships train/test — we need train/val/test).
+  val_fraction: 0.15
+
+  # Class names — index 0 must stay "negative", index 1 "positive".
+  # "negative" boxes are hard-negative regions (tumor-mimicking but benign
+  # tissue) kept from the source dataset; "positive" is an actual tumor.
+  names: ["negative", "positive"]
+  nc: 2
+
+  # Include the plane (axial/coronal/sagittal) as a filename prefix so a
+  # single unified model sees all three views instead of training 3 models.
+  planes: ["axial_t1wce_2_class", "coronal_t1wce_2_class", "sagittal_t1wce_2_class"]
+
+# ---------------------------------------------------------------------------
+# Model / training
+# ---------------------------------------------------------------------------
+model:
+  # Any Ultralytics YOLOv11 checkpoint: yolo11n/s/m/l/x.pt (n=nano..x=xlarge).
+  # Start with 'n' or 's' on limited hardware (Colab free tier, consumer GPU).
+  base_weights: "yolo11n.pt"
+  imgsz: 640
+
+train:
+  epochs: 150
+  batch: 8
+  patience: 30          # early stopping
+  workers: 8
+  device: ""             # "" = auto-select GPU if available, else CPU; or "0", "cpu", "mps"
+  amp: true               # automatic mixed precision
+  resume: false
+  optimizer: "auto"
+  lr0: 0.01
+  cos_lr: true
+  project_dir: "./runs/train"
+  run_name: "tumor_yolo11"
+  # Augmentation — kept conservative for medical imaging. Aggressive color
+  # jitter/HSV shifts and left-right flip are fine; avoid anything that
+  # invents anatomically impossible geometry (no mixup/mosaic-heavy defaults
+  # without validating they don't distort tumor shape signals).
+  augment:
+    hsv_h: 0.0            # MRI is grayscale-ish; hue jitter adds nothing real
+    hsv_s: 0.0
+    hsv_v: 0.3
+    degrees: 5.0           # small rotation only — MRI slices are roughly aligned
+    translate: 0.1
+    scale: 0.3
+    fliplr: 0.5             # left-right flip is anatomically valid
+    flipud: 0.0              # up-down flip is NOT anatomically valid — keep off
+    mosaic: 0.5
+    mixup: 0.0
+
+evaluate:
+  conf_thres: 0.25
+  iou_thres: 0.45
+  split: "test"          # evaluate.py default split
+  project_dir: "./runs/val"
+
+predict:
+  conf_thres: 0.35
+  iou_thres: 0.45
+  save_annotated: true
+  save_report_json: true
+  save_report_pdf: true
+  project_dir: "./runs/predict"
+
+export:
+  formats: ["onnx", "torchscript"]   # free/local formats only
+  imgsz: 640
+  half: false
+
+# ---------------------------------------------------------------------------
+# Experiment tracking (free/local only — no paid W&B features required)
+# ---------------------------------------------------------------------------
+tracking:
+  backend: "mlflow"        # "mlflow", "tensorboard", or "none"
+  mlflow_tracking_uri: "sqlite:///mlflow.db"
+  experiment_name: "brain-tumor-yolo11"
