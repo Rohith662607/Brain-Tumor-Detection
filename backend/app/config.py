@@ -27,7 +27,10 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./storage/app.db"
 
     # --- server ---
-    cors_origins: list[str] = ["http://localhost:3000"]
+    cors_origins: list[str] = [
+    "http://localhost:3000",
+    "https://brain-tumor-detection-topaz.vercel.app",
+]
     max_upload_mb: int = 20
 
     # --- AI report / chat / assistant ---
