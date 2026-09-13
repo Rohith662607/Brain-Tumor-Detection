@@ -1,5 +1,6 @@
-// REPLACES frontend/app/layout.tsx (v3 — ArbudaScan branding, theme
-// provider + no-flash boot script, animated neuron background)
+// REPLACES frontend/app/layout.tsx (v2 — main content padded on mobile so
+// it isn't hidden behind the new fixed top/bottom mobile nav bars; the
+// desktop/tablet layout is unaffected since that padding is sm:0)
 
 import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
@@ -42,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <NeuronBackground />
           <div className="relative z-10 flex h-screen w-screen overflow-hidden">
             <NavRail />
-            <main className="flex-1 overflow-y-auto">{children}</main>
+            <main className="flex-1 overflow-y-auto pt-14 pb-16 sm:pt-0 sm:pb-0">{children}</main>
           </div>
         </ThemeProvider>
       </body>
